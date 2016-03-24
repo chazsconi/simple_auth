@@ -68,11 +68,6 @@ def change do
 end
 ```
 
-### Add the following routes to your router:
-```
-TODO: Some routes
-```
-
 ### Add a login controller
 
 ```elixir
@@ -81,6 +76,13 @@ defmodule MyProject.LoginController do
   # Import login methods
   use SimpleAuth.LoginController
 end
+```
+
+### Add the routes to the router
+```elixir
+get    "/login",  LoginController, :show
+post   "/login",  LoginController, :login
+delete "/logout", LoginController, :logout
 ```
 
 ### Add a login view
