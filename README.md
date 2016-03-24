@@ -48,6 +48,25 @@ defmodule MyProject.User do
 
 end
 ```
+### Create a migration
+`mix ecto.gen.migration create_user`
+and then set the change function to:
+
+
+```elixir
+def change do
+  create table(:users) do
+    add :email, :string
+    add :crypted_password, :string
+    add :roles, {:array, :string}
+    add :attempts, :integer
+    add :attempted_at, :datetime, null: true
+
+    timestamps
+  end
+  create unique_index(:users, [:email])
+end
+```
 
 ### Add the following routes to your router:
 ```
@@ -72,6 +91,7 @@ end
 ```
 
 ### Create a login template
+In `login/login.html.eex`
 ```elixir
 <%= form_for @conn, login_path(@conn, :login), [as: :credentials], fn f -> %>
   <div class="form-group">
@@ -96,6 +116,12 @@ import SimpleAuth.AccessControl
 plug :authorize, ["ROLE_ADMIN"] when action in [:action_1, :action_2]
 ```
 
+### Give access to helper functions in view
+In `web.ex` add this in the view macro:
+```elixir
+import SimpleAuth.AccessControl, only: [current_user: 1, logged_in?: 1, any_granted?: 2]
+```
+
 ### Check roles in web pages
 ```html
 <%= if any_granted?(@conn, ["ROLE_ADMIN"]) do %>
@@ -114,3 +140,9 @@ plug :authorize, ["ROLE_ADMIN"] when action in [:action_1, :action_2]
 ```
 
 ### Add users to DB
+This can be done from iex
+```elixir
+  %MyProject.User{email: "joe@bloggs.com",
+  crypted_password: Comeonin.Bcrypt.hashpwsalt("password"),
+  roles: ["ROLE_ADMIN"]} |> MyProject.Repo.insert
+```
