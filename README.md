@@ -11,12 +11,35 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
         def deps do
           [{:simple_auth, "~> 0.0.1"}]
         end
+  2. If using `SimpleAuth.UserSession.Memory` api, add `:simple_auth` to your list of applications
+
 ## Use
 
 ### Add configuration
 ```elixir
-TODO: tidy up config
+config :simple_auth, :error_view, MyApp.ErrorView
+config :simple_auth, :repo, MyApp.Repo
+config :simple_auth, :user_model, MyApp.User
+config :simple_auth, :user_session_api, SimpleAuth.UserSession.Memory
+
+# The following two only apply for SimpleAuth.UserSession.Memory
+
+# Optional callback to invoke when the session expires or is deleted
+# It takes 1 parameter which is the user_id whose session has expired
+# Sessions are checked periodically (every minute) to ensure they are not expired
+config :simple_auth, :expiry_callback, {Zurich.LoginController, :session_expired }
+
+# Time before a session expires
+config :simple_auth, :session_expiry_seconds, 600
+
 ```
+For the `:user_session_api` the choices are:
+  * `SimpleAuth.UserSession.HTTPSession` - The user details are stored `Plug.Conn` session
+  * `SimpleAuth.UserSession.Memory` - The details are stored in a GenServer with just the
+    user_id stored in the `Plug.Conn` session.  Logging out for a given user will kill all
+    that user's sessions and provides a callback that can be invoked on session expiry.
+  * `SimpleAuth.UserSession.Assigns` - A version that can be used in tests which puts the user
+    in `conn.assigns`.
 
 ### Create a user model
 
@@ -75,8 +98,21 @@ defmodule MyProject.LoginController do
   use MyProject.Web, :controller
   # Import login methods
   use SimpleAuth.LoginController
+
+  # optional callback
+  def on_login_success(conn, user, password) do
+    # additional login logic here
+  end
+
+  # optional callback
+  def on_logout(conn, user) do
+    # additional logout logic here
+  end
 end
 ```
+
+The two callbacks `on_login_success/3` and `on_logout/2` can be optionally implemented if
+additional logic is required - e.g. logging the user's login/logout times to a DB
 
 ### Add the routes to the router
 ```elixir

@@ -3,8 +3,8 @@ defmodule SimpleAuth.Mixfile do
 
   def project do
     [app: :simple_auth,
-     version: "1.0.3",
-     elixir: "~> 1.2",
+     version: "1.1.0",
+     elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps]
@@ -14,7 +14,8 @@ defmodule SimpleAuth.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [mod: {SimpleAuth, []},
+     applications: [:logger]]
   end
 
   # Dependencies can be Hex packages:

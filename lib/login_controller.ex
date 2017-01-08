@@ -12,6 +12,7 @@ defmodule SimpleAuth.LoginController do
       def login(conn, %{"credentials" => %{"email" => email, "password" => password}}) do
         case SimpleAuth.Authenticate.login(email, password) do
           {:ok, user} ->
+            :ok = on_login_success(conn, user, password)
             conn
             |> UserSession.put(user)
             |> put_flash(:info, "Logged in")
@@ -28,11 +29,20 @@ defmodule SimpleAuth.LoginController do
       end
 
       def logout(conn, _) do
+        :ok = on_logout(conn, UserSession.get(conn))
         conn
         |> UserSession.delete
         |> put_flash(:info, "Logged out")
         |> redirect(to: "/")
       end
+
+      @doc "Called when the user is successfully logged in"
+      def on_login_success(_conn, _user, _password), do: :ok
+
+      @doc "Called when the user is successfully logged in"
+      def on_logout(_conn, _user), do: :ok
+
+      defoverridable [on_login_success: 3, on_logout: 2]
     end
   end
 end
