@@ -27,9 +27,12 @@ defmodule SimpleAuth.UserSession.Memory do
   end
 
   def delete(conn) do
-    user = SimpleAuth.UserSession.HTTPSession.get(conn)
-    :ok = GenServer.call(__MODULE__, {:delete, user.id})
-    Plug.Conn.delete_session(conn, :user_id)
+    case Plug.Conn.get_session(conn, :user_id) do
+      nil -> conn
+      user_id ->
+        :ok = GenServer.call(__MODULE__, {:delete, user_id})
+        Plug.Conn.delete_session(conn, :user_id)
+    end
   end
 end
 
