@@ -4,12 +4,12 @@ defmodule SimpleAuth.AccessControl do
   import Plug.Conn
 
   @error_view Application.get_env(:simple_auth, :error_view)
-
+  @login_url Application.get_env(:simple_auth, :login_url) || "/login"
   def authorize(conn, roles) do
     if !logged_in?(conn) do
       Logger.info "Not logged in"
       conn
-      |> Phoenix.Controller.redirect(to: "/login")
+      |> redirect_to_login
       |> halt
     else
       if any_granted?(conn, roles) do
@@ -23,6 +23,18 @@ defmodule SimpleAuth.AccessControl do
       end
     end
   end
+
+  defp redirect_to_login(conn) do
+    url = login_url(conn, @login_url)
+    if String.first(url) == "/" do
+      Phoenix.Controller.redirect(conn, to: url)
+    else
+      Phoenix.Controller.redirect(conn, external: url)
+    end
+  end
+
+  def login_url(conn, url) when is_binary(url), do: url
+  def login_url(conn, {module, function}), do: apply(module, function, [])
 
   @doc "Gets the current user"
   def current_user(conn), do: UserSession.get(conn)

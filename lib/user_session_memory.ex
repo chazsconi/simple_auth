@@ -91,7 +91,7 @@ defmodule SimpleAuth.UserSession.MemoryGenServer do
         end)
       |> Map.new
 
-    Process.send_after(self, :check_expired_sessions, @expired_check_interval_seconds * 1000)
+    Process.send_after(self(), :check_expired_sessions, @expired_check_interval_seconds * 1000)
     sessions
   end
 
