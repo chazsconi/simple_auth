@@ -5,6 +5,7 @@ defmodule SimpleAuth.AccessControl do
 
   @error_view Application.get_env(:simple_auth, :error_view)
   @login_url Application.get_env(:simple_auth, :login_url) || "/login"
+
   def authorize(conn, roles) do
     if !logged_in?(conn) do
       Logger.info "Not logged in"
@@ -33,8 +34,8 @@ defmodule SimpleAuth.AccessControl do
     end
   end
 
-  def login_url(conn, url) when is_binary(url), do: url
-  def login_url(conn, {module, function}), do: apply(module, function, [])
+  def login_url(_conn, url) when is_binary(url), do: url
+  def login_url(_conn, {module, function}), do: apply(module, function, [])
 
   @doc "Gets the current user"
   def current_user(conn), do: UserSession.get(conn)
