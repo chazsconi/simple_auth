@@ -26,7 +26,7 @@ defmodule SimpleAuth.Authenticate do
   end
 
   defp increment_attempts(user) do
-    repo().update!(user_model().changeset(user, %{attempts: user.attempts + 1, attempted_at: Ecto.DateTime.utc}))
+    repo().update!(user_model().changeset(user, %{attempts: user.attempts + 1, attempted_at: NaiveDateTime.utc_now()}))
   end
 
   defp authenticate(user, password) do

@@ -53,17 +53,15 @@ defmodule MyProject.User do
     field :password, :string, virtual: true
     field :roles, {:array, :string}
     field :attempts, :integer, default: 0
-    field :attempted_at, Ecto.DateTime
+    field :attempted_at, :naive_datetime
 
     timestamps
   end
 
-  @required_fields ~w(email crypted_password attempts)
-  @optional_fields ~w(attempted_at)
-
   def changeset(model, params \\ :empty) do
     model
-    |> cast(params, @required_fields, @optional_fields)
+    |> cast(params, [:email, :crypted_password, :attempts, :attempted_at])
+    |> validate_required([:email, :crypted_password, :attempts])
     |> unique_constraint(:email)
     |> validate_format(:email, ~r/@/)
     |> validate_length(:password, min: 5)
