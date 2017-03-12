@@ -13,7 +13,7 @@ defmodule SimpleAuth.Authenticate do
     user = repo().get_by(user_model(), email: String.downcase(email))
     case authenticate(user, password) do
       true ->
-        repo().update(user_model.changeset(user, %{attempts: 0}))
+        repo().update(user_model().changeset(user, %{attempts: 0}))
       :blocked ->
         increment_attempts(user)
         :blocked
