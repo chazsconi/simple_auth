@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.3.1
+
+* Enhancements
+  * Relax Phoenix version dependency to allow use with Phoenix 1.3.0 release candidates
+
 ## v1.3.0
 
 * Enhancements
