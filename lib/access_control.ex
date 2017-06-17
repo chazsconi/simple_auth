@@ -40,6 +40,21 @@ defmodule SimpleAuth.AccessControl do
   @doc "Gets the current user"
   def current_user(conn), do: UserSession.get(conn)
 
+  @doc "Get remaining seconds for the session or nil if expired (if supported by the API)"
+  def remaining_seconds(conn) do
+    case UserSession.info(conn) do
+      {:ok, %{remaining_seconds: secs}} -> secs
+      _ -> nil
+    end
+  end
+
+  def can_refresh?(conn) do
+    case UserSession.info(conn) do
+      {:ok, %{can_refresh?: can?}} -> can?
+      _ -> nil
+    end
+  end
+
   @doc "True if user logged in"
   def logged_in?(conn), do: !!current_user(conn)
 

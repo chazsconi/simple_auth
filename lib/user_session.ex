@@ -18,6 +18,8 @@ defmodule SimpleAuth.UserSession do
   def get(conn),       do: @user_session_api.get(conn)
   def put(conn, user), do: @user_session_api.put(conn, user)
   def delete(conn),    do: @user_session_api.delete(conn)
+  def refresh(conn),   do: @user_session_api.refresh(conn)
+  def info(conn), do: @user_session_api.info(conn)
 
   def __after_compile__(_env, _bytecode) do
     IO.inspect "MIX_ENV=#{Mix.env}"

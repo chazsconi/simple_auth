@@ -28,6 +28,31 @@ defmodule SimpleAuth.LoginController do
         end
       end
 
+      @doc "Refreshes the session"
+      def refresh(conn, _) do
+        conn
+        |> respond_with_user_session_info(&UserSession.refresh/1)
+      end
+
+      @doc "Gets the remaining seconds available"
+      def info(conn, _) do
+        conn
+        |> respond_with_user_session_info(&UserSession.info/1)
+      end
+
+      defp respond_with_user_session_info(conn, fun) do
+        response =
+          case fun.(conn) do
+            :expired
+              -> %{"status" => "expired"}
+            {:ok, %{remaining_seconds: seconds, can_refresh?: can_refresh?}}
+              -> %{"status" => "ok", "remainingSeconds" => seconds,
+                "canRefresh" => can_refresh?}
+          end
+        conn
+        |> json(response)
+      end
+
       def logout(conn, _) do
         :ok = on_logout(conn, UserSession.get(conn))
         conn
