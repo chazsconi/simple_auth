@@ -22,7 +22,7 @@ config :simple_auth, :repo, MyApp.Repo
 config :simple_auth, :user_model, MyApp.User
 config :simple_auth, :user_session_api, SimpleAuth.UserSession.Memory
 
-# The following two only apply for SimpleAuth.UserSession.Memory
+# The following options only apply for SimpleAuth.UserSession.Memory
 
 # Optional callback to invoke when the session expires or is deleted
 # It takes 1 parameter which is the user_id whose session has expired
@@ -31,6 +31,10 @@ config :simple_auth, :expiry_callback, {Zurich.LoginController, :session_expired
 
 # Time before a session expires
 config :simple_auth, :session_expiry_seconds, 600
+
+# Number of times the user can refresh the session (setting the expiry back to the maximum)
+# 0 = never, nil = infinitely
+config :simple_auth, :session_refresh_limit, 5
 
 ```
 For the `:user_session_api` the choices are:
@@ -118,6 +122,24 @@ get    "/login",  LoginController, :show
 post   "/login",  LoginController, :login
 delete "/logout", LoginController, :logout
 ```
+#### Optional additional api routes only for SimpleAuth.UserSession.Memory
+```elixir
+pipe_through :api
+put "/login/refresh",  LoginController, :refresh
+get "/login/info",  LoginController, :info
+```
+These can be used from the browser to refresh the session and also get information
+about the session, for example to display the remaining session time in the header, and a button
+to refresh it.
+
+These will both return:
+```json
+{"status": "ok", "remainingSeconds": 125, "canRefresh": true}
+```
+or if the session has expired
+```json
+{"status": "expired"}
+```
 
 ### Add a login view
 ```elixir
@@ -157,6 +179,8 @@ In `web.ex` add this in the view macro:
 ```elixir
 import SimpleAuth.AccessControl, only: [current_user: 1, logged_in?: 1, any_granted?: 2]
 ```
+These imports can also be added to the view: `remaining_seconds/1, can_refresh?/1`.
+These allow checking the remaining seconds of the session and if the user can refresh the session.
 
 ### Check roles in web pages
 ```html
