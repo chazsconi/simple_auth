@@ -2,16 +2,17 @@ defmodule SimpleAuth.LoginController do
   defmacro __using__(_options) do
     quote do
       alias SimpleAuth.UserSession
-      @authenticate_api Application.get_env(:simple_auth, :authenticate_api)
+      @authenticate_api Application.get_env(:simple_auth, :authenticate_api) || SimpleAuth.Authenticate.Repo
+      @username_field (Application.get_env(:simple_auth, :username_field) || :email) |> to_string
 
       @doc "Shows the login page"
       def show(conn, _params) do
         render conn, "login.html"
       end
 
-      @doc "Handles submit to the login page with email/password"
-      def login(conn, %{"credentials" => %{"email" => email, "password" => password}}) do
-        case @authenticate_api.login(email, password) do
+      @doc "Handles submit to the login page with username/password"
+      def login(conn, %{"credentials" => %{@username_field => username, "password" => password}}) do
+        case @authenticate_api.login(username, password) do
           {:ok, user} ->
             :ok = on_login_success(conn, user, password)
             conn
@@ -20,7 +21,7 @@ defmodule SimpleAuth.LoginController do
             |> redirect(to: "/")
           :error ->
             conn
-            |> put_flash(:info, "Wrong email or password")
+            |> put_flash(:info, "Invalid credentials")
             |> render("login.html")
           :blocked ->
             conn

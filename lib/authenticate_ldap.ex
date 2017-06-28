@@ -7,6 +7,7 @@ defmodule SimpleAuth.Authenticate.Ldap do
 
   @repo Application.get_env(:simple_auth, :repo)
   @user_model Application.get_env(:simple_auth, :user_model)
+  @username_field Application.get_env(:simple_auth, :username_field) || :email
   @ldap_helper Application.get_env(:simple_auth, :ldap_helper_module)
 
   # This indirection prevents compiler warnings
@@ -28,15 +29,15 @@ defmodule SimpleAuth.Authenticate.Ldap do
   end
 
   defp get_or_insert_user(username) do
-    case @repo.get_by(user_model(), username: username) do
+    case @repo.get_by(user_model(), [{@username_field, username}]) do
       nil ->
         Logger.info "Adding user #{username}..."
-        changeset = user_model().changeset(struct(user_model()), %{username: username})
+        changeset = user_model().changeset(struct(user_model()), Map.put(%{}, @username_field, username))
         {:ok, user} = repo().insert(changeset)
         Logger.info "Done id: #{user.id}"
         user
       user ->
-        Logger.info "User already exists: #{user.id} #{user.username}"
+        Logger.info "User already exists: #{user.id} #{username}"
         user
     end
   end
