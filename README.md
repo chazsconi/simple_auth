@@ -20,7 +20,9 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 config :simple_auth, :error_view, MyApp.ErrorView
 config :simple_auth, :repo, MyApp.Repo
 config :simple_auth, :user_model, MyApp.User
+config :simple_auth, :username_field, :email  # field in User model and login form that user uses to login (default is :email)
 config :simple_auth, :user_session_api, SimpleAuth.UserSession.Memory
+
 
 # The following options only apply for SimpleAuth.UserSession.Memory
 
@@ -52,7 +54,7 @@ defmodule MyProject.User do
   use MyProject.Web, :model
 
   schema "users" do
-    field :email, :string
+    field :email, :string # Must match the field name specified in :username_field config setting
     field :crypted_password, :string
     field :password, :string, virtual: true
     field :roles, {:array, :string}
@@ -205,4 +207,53 @@ This can be done from iex
   %MyProject.User{email: "joe@bloggs.com",
   crypted_password: Comeonin.Bcrypt.hashpwsalt("password"),
   roles: ["ROLE_ADMIN"]} |> MyProject.Repo.insert
+```
+
+## Advanced Use
+
+### LDAP
+
+Instead of using passwords stored in the DB, an LDAP server can be used to authenticate users.
+This uses the [exldap](https://github.com/jmerriweather/exldap) package.
+
+A User DB table is still used, but rows are automatically inserted for any new users logging in.
+
+To use LDAP do the same as the basic configuration (apart from the user model and migrations - see below)
+and also do the following:
+
+### Add configuration
+To use LDAP add the following additional entry to the config:
+```elixir
+config :simple_auth, :authenticate_api, SimpleAuth.Authenticate.Ldap
+```
+
+Also add the `server`, `port` and `ssl` LDAP configuration for exldap.  For example:
+```elixir
+config :exldap, :settings,
+  server: "my.ldap.server",
+  port: 389,
+  ssl: false
+```
+
+### User model and migrations differences
+Create a user model and migrations (as above) but only include the `username`, `roles` and timestamp columns.
+Passwords and blocking of users should be handled by the LDAP server.
+
+### Create helper module
+Typically the user will login using a username, e.g. `john.smith`, however the LDAP server
+will probably expect usernames in a different format e.g. `mycorp\john.smith` or `CN=john.smith`.
+Therefore a module must be provided with a `build_ldap_user/1` function to translate the username as entered by the user
+to the user field expected by LDAP.
+
+For example for the second example, create a module as follows:
+```elixir
+defmodule MyApp.LdapHelper do
+  @behaviour SimpleAuth.LdapHelperAPI
+  def build_ldap_user(username), do: "CN=#{username}"
+end
+```
+
+Point to this module in the config:
+```elixir
+config :simple_auth, :ldap_helper_module, MyApp.LdapHelper
 ```
