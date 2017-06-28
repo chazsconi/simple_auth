@@ -2,6 +2,7 @@ defmodule SimpleAuth.LoginController do
   defmacro __using__(_options) do
     quote do
       alias SimpleAuth.UserSession
+      @authenticate_api Application.get_env(:simple_auth, :authenticate_api)
 
       @doc "Shows the login page"
       def show(conn, _params) do
@@ -10,7 +11,7 @@ defmodule SimpleAuth.LoginController do
 
       @doc "Handles submit to the login page with email/password"
       def login(conn, %{"credentials" => %{"email" => email, "password" => password}}) do
-        case SimpleAuth.Authenticate.login(email, password) do
+        case @authenticate_api.login(email, password) do
           {:ok, user} ->
             :ok = on_login_success(conn, user, password)
             conn
