@@ -235,6 +235,11 @@ config :exldap, :settings,
   ssl: false
 ```
 
+Add exldap to the list of deps in `mix.exs`:
+```elixir
+{:exldap, "~> 0.4"}
+```
+
 ### User model and migrations differences
 Create a user model and migrations (as above) but only include the `username`, `roles` and timestamp columns.
 Passwords and blocking of users should be handled by the LDAP server.

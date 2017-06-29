@@ -19,7 +19,9 @@ defmodule SimpleAuth.Authenticate.Ldap do
     {:ok, connection} = Exldap.open()
     user = ldap_helper().build_ldap_user(username)
     Logger.info "Checking LDAP credentials for user: #{user}"
-    case Exldap.verify_credentials(connection, user, password) do
+    verify_result = Exldap.verify_credentials(connection, user, password)
+    Exldap.close(connection)
+    case verify_result do
       :ok ->
         user = get_or_insert_user(username)
         {:ok, user}
