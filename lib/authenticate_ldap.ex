@@ -20,22 +20,27 @@ defmodule SimpleAuth.Authenticate.Ldap do
     user = ldap_helper().build_ldap_user(username)
     Logger.info "Checking LDAP credentials for user: #{user}"
     verify_result = Exldap.verify_credentials(connection, user, password)
-    Exldap.close(connection)
-    case verify_result do
+    result = case verify_result do
       :ok ->
-        user = get_or_insert_user(username)
+        user = get_or_insert_user(username, connection)
         {:ok, user}
       {:error, _} ->
         :error
     end
+    Exldap.close(connection)
+    result
   end
 
-  defp get_or_insert_user(username) do
+  defp get_or_insert_user(username, connection) do
     case @repo.get_by(user_model(), [{@username_field, username}]) do
       nil ->
-        Logger.info "Adding user #{username}..."
-        changeset = user_model().changeset(struct(user_model()), Map.put(%{}, @username_field, username))
-        {:ok, user} = repo().insert(changeset)
+        Logger.info "Adding user: #{username}"
+        {:ok, user} =
+          struct(user_model())
+          |> Map.put(@username_field, username)
+          |> ldap_helper().enhance_user(connection)
+          |> user_model().changeset(%{})
+          |> repo().insert()
         Logger.info "Done id: #{user.id}"
         user
       user ->

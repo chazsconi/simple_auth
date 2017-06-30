@@ -255,6 +255,21 @@ For example for the second example, create a module as follows:
 defmodule MyApp.LdapHelper do
   @behaviour SimpleAuth.LdapHelperAPI
   def build_ldap_user(username), do: "CN=#{username}"
+  def enhance_user(user, _connection), do: user
+end
+```
+
+The `enhance_user/2` function allows enhancing the user structure before it is added to the database.  The
+function receives the user struct and a connection to LDAP allowing querying of other fields which can then
+be populated in the struct.  For example to get the display name the following can be used (this example
+uses an MS ActiveDirectory server):
+
+```elixir
+def enhance_user(%User{username: username}=user, connection) do
+  {:ok, search_results} = Exldap.search_field(connection, "dc=mycorp,dc=com", "sAMAccountName", username)
+  {:ok, first_result} = search_results |> Enum.fetch(0)
+  display_name = Exldap.search_attributes(first_result, "displayName")
+  %User{user | display_name: display_name}
 end
 ```
 
