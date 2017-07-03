@@ -6,23 +6,47 @@ defmodule SimpleAuth.AccessControl do
   @error_view Application.get_env(:simple_auth, :error_view)
   @login_url Application.get_env(:simple_auth, :login_url) || "/login"
 
+  @doc "Plug to authorize and redirect if not authorized"
   def authorize(conn, roles) do
     if !logged_in?(conn) do
       Logger.info "Not logged in"
-      conn
-      |> redirect_to_login
-      |> halt
+      if conn.private[:simple_auth_no_redirect_on_unauthorized] do
+        conn
+        |> text_unauthorized()
+      else
+        conn
+        |> redirect_to_login
+        |> halt
+      end
     else
       if any_granted?(conn, roles) do
         conn
       else
         Logger.info "Not authorized"
-        conn
-        |> put_status(401)
-        |> Phoenix.Controller.render(@error_view, "401.html")
-        |> halt
+        if conn.private[:simple_auth_no_redirect_on_unauthorized] do
+          conn
+          |> text_unauthorized()
+        else
+          conn
+          |> put_status(401)
+          |> Phoenix.Controller.render(@error_view, "401.html")
+          |> halt
+        end
       end
     end
+  end
+
+  defp text_unauthorized(conn) do
+    conn
+    |> put_status(401)
+    |> Phoenix.Controller.text("Unauthorized")
+    |> halt
+  end
+
+  @doc "Plug to have unauthorized requests not redirect and just return a text response (for API usage)"
+  def no_redirect_on_unauthorized(conn, _opts) do
+    conn
+    |> put_private(:simple_auth_no_redirect_on_unauthorized, true)
   end
 
   defp redirect_to_login(conn) do
@@ -67,7 +91,8 @@ defmodule SimpleAuth.AccessControl do
     |> MapSet.new
   end
 
-  @doc "Returns true if the current user has any of the given roles"
+  @doc "Returns true if the current user has any of the given roles or the given role list is empty"
+  def any_granted?(_conn, []), do: true
   def any_granted?(conn, check_roles) when is_list(check_roles) do
       any_granted?(conn, MapSet.new(check_roles))
   end

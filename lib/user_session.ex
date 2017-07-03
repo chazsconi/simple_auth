@@ -22,8 +22,8 @@ defmodule SimpleAuth.UserSession do
   def info(conn), do: @user_session_api.info(conn)
 
   def __after_compile__(_env, _bytecode) do
-    IO.inspect "MIX_ENV=#{Mix.env}"
-    IO.inspect "@user_session_api = #{@user_session_api}"
+    IO.puts "simple_auth compiling with:"
+    IO.puts "@user_session_api = #{@user_session_api}"
   end
 
 end
