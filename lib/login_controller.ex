@@ -1,4 +1,7 @@
 defmodule SimpleAuth.LoginController do
+  @moduledoc """
+  Macros for generating methods for a login controller
+  """
   defmacro __using__(_options) do
     quote do
       alias SimpleAuth.UserSession

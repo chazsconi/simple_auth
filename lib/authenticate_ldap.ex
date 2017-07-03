@@ -15,6 +15,10 @@ defmodule SimpleAuth.Authenticate.Ldap do
   defp user_model, do: @user_model
   defp ldap_helper, do: @ldap_helper
 
+  @doc """
+    Checks the user and password against the LDAP server.  If succeeds adds
+    the user to the DB if it is not there already
+  """
   def login(username, password) do
     {:ok, connection} = Exldap.open()
     user = ldap_helper().build_ldap_user(username)

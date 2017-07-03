@@ -3,11 +3,16 @@ defmodule SimpleAuth.Mixfile do
 
   def project do
     [app: :simple_auth,
-     version: "1.5.0",
+     version: "1.5.1",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps()]
+     description: description(),
+     package: package(),
+     deps: deps(),
+     name: "SimpleAuth",
+     source_url: "https://github.com/chazsconi/simple_auth",
+     docs: docs()]
   end
 
   # Configuration for the OTP application
@@ -18,18 +23,34 @@ defmodule SimpleAuth.Mixfile do
      applications: [:logger]]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type "mix help deps" for more examples and options
   defp deps do
-    [{:phoenix, ">= 1.1.2-rc"},
+    [{:phoenix, "~> 1.2.0"},
     {:comeonin, "~> 3.0"},
-    {:exldap, "~> 0.4"}]
+    {:exldap, "~> 0.4"},
+    {:ex_doc, ">= 0.0.0", only: :dev}]
+  end
+
+  defp description do
+    """
+    Adds authentication and authorization to a Phoenix project.  A user can login
+    with a username and password held in the DB or against an LDAP server.
+    """
+  end
+
+  defp package do
+    # These are the default files included in the package
+    [
+      name: :simple_auth,
+      maintainers: ["Charles Bernasconi"],
+      licenses: ["Apache 2.0"],
+      links: %{"GitHub" => "https://github.com/chazsconi/simple_auth"}
+    ]
+  end
+
+  defp docs do
+    [
+      extras: ["README.md"],
+      main: "readme"
+    ]
   end
 end

@@ -1,4 +1,7 @@
 defmodule SimpleAuth.Authenticate.Repo do
+  @moduledoc """
+  Implementation that checks authenticates user against a database with a username/password
+  """
   @max_attempts 3
   @repo Application.get_env(:simple_auth, :repo)
   @user_model Application.get_env(:simple_auth, :user_model)

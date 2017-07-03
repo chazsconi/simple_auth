@@ -1,4 +1,7 @@
 defmodule SimpleAuth.AccessControl do
+  @moduledoc """
+  Plugs for authorization
+  """
   alias SimpleAuth.UserSession
   require Logger
   import Plug.Conn

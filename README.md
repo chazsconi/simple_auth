@@ -8,14 +8,13 @@ be checked within a controller using a plug or within a template.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+Add `simple_auth` to your list of dependencies in `mix.exs`:
 
-  1. Add simple_auth to your list of dependencies in `mix.exs`:
-
-        def deps do
-          [{:simple_auth, "~> 0.0.1"}]
-        end
-  2. If using `SimpleAuth.UserSession.Memory` api, add `:simple_auth` to your list of applications
+```elixir
+def deps do
+  [{:simple_auth, "~> 1.5.1"}]
+end
+```
 
 ## Basic Use
 

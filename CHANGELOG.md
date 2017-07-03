@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.5.1
+
+* Enhancements
+  * Fixed documentation
+  * Added requirements to publish as Hex package
+* Other
+  * Removed support for Phoenix 1.3.0 release candidate as cannot publish otherwise
+
 ## v1.5.0
 
 * Enhancements
