@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.5.0
+
+* Enhancements
+  * LDAP authentication support
+  * Configurable username field (previously was 'email')
+  * Configurable no redirection for ajax requests
+
+## v1.4.0
+
+* Enhancements
+  * Session refresh and info endpoints
+
 ## v1.3.1
 
 * Enhancements
