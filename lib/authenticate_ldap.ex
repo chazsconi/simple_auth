@@ -32,7 +32,7 @@ defmodule SimpleAuth.Authenticate.Ldap do
   end
 
   defp get_or_insert_user(username, connection) do
-    case @repo.get_by(user_model(), [{@username_field, username}]) do
+    case repo().get_by(user_model(), [{@username_field, username}]) do
       nil ->
         Logger.info "Adding user: #{username}"
         {:ok, user} =

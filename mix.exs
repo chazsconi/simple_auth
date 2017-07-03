@@ -29,6 +29,7 @@ defmodule SimpleAuth.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [{:phoenix, ">= 1.1.2-rc"},
-    {:comeonin, "~> 3.0"}]
+    {:comeonin, "~> 3.0"},
+    {:exldap, "~> 0.4"}]
   end
 end

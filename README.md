@@ -1,6 +1,10 @@
 # SimpleAuth
 
-Adds authentication and authorization to a Phoenix project.
+Adds authentication and authorization to a Phoenix project.  It allows a user to login
+with a username and password held in the DB or alternatively authenticate against an LDAP server.
+
+The user can have one or more roles associated with them which are loaded from the DB and can
+be checked within a controller using a plug or within a template.
 
 ## Installation
 
@@ -13,7 +17,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
         end
   2. If using `SimpleAuth.UserSession.Memory` api, add `:simple_auth` to your list of applications
 
-## Use
+## Basic Use
 
 ### Add configuration
 ```elixir
@@ -21,31 +25,8 @@ config :simple_auth, :error_view, MyApp.ErrorView
 config :simple_auth, :repo, MyApp.Repo
 config :simple_auth, :user_model, MyApp.User
 config :simple_auth, :username_field, :email  # field in User model and login form that user uses to login (default is :email)
-config :simple_auth, :user_session_api, SimpleAuth.UserSession.Memory
-
-
-# The following options only apply for SimpleAuth.UserSession.Memory
-
-# Optional callback to invoke when the session expires or is deleted
-# It takes 1 parameter which is the user_id whose session has expired
-# Sessions are checked periodically (every minute) to ensure they are not expired
-config :simple_auth, :expiry_callback, {Zurich.LoginController, :session_expired }
-
-# Time before a session expires
-config :simple_auth, :session_expiry_seconds, 600
-
-# Number of times the user can refresh the session (setting the expiry back to the maximum)
-# 0 = never, nil = infinitely
-config :simple_auth, :session_refresh_limit, 5
-
+config :simple_auth, :user_session_api, SimpleAuth.UserSession.HTTPSession # See Advanced section for more options
 ```
-For the `:user_session_api` the choices are:
-  * `SimpleAuth.UserSession.HTTPSession` - The user details are stored `Plug.Conn` session
-  * `SimpleAuth.UserSession.Memory` - The details are stored in a GenServer with just the
-    user_id stored in the `Plug.Conn` session.  Logging out for a given user will kill all
-    that user's sessions and provides a callback that can be invoked on session expiry.
-  * `SimpleAuth.UserSession.Assigns` - A version that can be used in tests which puts the user
-    in `conn.assigns`.
 
 ### Create a user model
 
@@ -124,24 +105,6 @@ get    "/login",  LoginController, :show
 post   "/login",  LoginController, :login
 delete "/logout", LoginController, :logout
 ```
-#### Optional additional api routes only for SimpleAuth.UserSession.Memory
-```elixir
-pipe_through :api
-put "/login/refresh",  LoginController, :refresh
-get "/login/info",  LoginController, :info
-```
-These can be used from the browser to refresh the session and also get information
-about the session, for example to display the remaining session time in the header, and a button
-to refresh it.
-
-These will both return:
-```json
-{"status": "ok", "remainingSeconds": 125, "canRefresh": true}
-```
-or if the session has expired
-```json
-{"status": "expired"}
-```
 
 ### Add a login view
 ```elixir
@@ -171,18 +134,34 @@ In `login/login.html.eex`
 ```
 
 ### Protect controllers
+To protect an action in a controller from unauthorised access add the plug `authorize` for the required actions.
+If the user is not logged in they will be redirected to the login page.  If they are are logged in but not authorized
+for this role, they will be shown an unauthorized page.
+
 ```elixir
 import SimpleAuth.AccessControl
 plug :authorize, ["ROLE_ADMIN"] when action in [:action_1, :action_2]
 ```
+
+#### API actions
+
+For protecting API actions invoked with an AJAX request a redirection is not desirable.  Therefore for any API pipeline in
+you app add the `no_redirect_on_unauthorized` plug. e.g.
+```elixir
+pipeline :api do
+  plug :accepts, ["json"]
+  plug :fetch_session # Needed to send the session cookie from the browser
+  plug :no_redirect_on_unauthorized
+end
+```
+
+This will return just a status code of 401 in the case the user is not logged in or not authorized.
 
 ### Give access to helper functions in view
 In `web.ex` add this in the view macro:
 ```elixir
 import SimpleAuth.AccessControl, only: [current_user: 1, logged_in?: 1, any_granted?: 2]
 ```
-These imports can also be added to the view: `remaining_seconds/1, can_refresh?/1`.
-These allow checking the remaining seconds of the session and if the user can refresh the session.
 
 ### Check roles in web pages
 ```html
@@ -211,7 +190,70 @@ This can be done from iex
 
 ## Advanced Use
 
-### LDAP
+### User Session Storage
+
+The simplest storage for the User Session is
+```elixir
+config :simple_auth, :user_session_api, SimpleAuth.UserSession.HTTPSession
+```
+which stores the session in `Plug.Conn` session.  However the following other implementations
+are available:
+* `SimpleAuth.UserSession.Memory` - The details are stored in a GenServer with just the
+  user_id stored in the `Plug.Conn` session.  Logging out for a given user will kill all
+  that user's sessions and provides a callback that can be invoked on session expiry.
+* `SimpleAuth.UserSession.Assigns` - A version that can be used in tests which puts the user
+  in `conn.assigns`.
+
+####  UserSession.Memory additional api endpoints
+`SimpleAuth.UserSession.Memory` supports these additional endpoints.
+
+```elixir
+pipe_through :api
+put "/login/refresh",  LoginController, :refresh
+get "/login/info",  LoginController, :info
+```
+These can be used from the browser to refresh the session and also get information
+about the session, for example to display the remaining session time in the menu bar, and a button
+to refresh it.
+
+These will both return:
+```json
+{"status": "ok", "remainingSeconds": 125, "canRefresh": true}
+```
+or if the session has expired
+```json
+{"status": "expired"}
+```
+
+These imports can also be added to the view: `remaining_seconds/1, can_refresh?/1`.
+These allow checking the remaining seconds of the session and if the user can refresh the session.
+
+#### UserSession.Memory configuration options
+For `SimpleAuth.UserSession.Memory` the following additional configuration options are available:
+
+##### Session Expiry Callback
+```elixir
+config :simple_auth, :expiry_callback, {MyApp.LoginController, :session_expired }
+```
+
+This is an optional callback to invoke when the session expires or is deleted.
+It takes 1 parameter which is the user_id whose session has expired.
+Sessions are checked periodically (every minute) to ensure they are not expired
+
+##### Session expiry time
+```elixir
+config :simple_auth, :session_expiry_seconds, 600
+```
+
+##### Refresh limit
+```elixir
+config :simple_auth, :session_refresh_limit, 5
+```
+The number of times the user can refresh the session (setting the expiry back to the maximum)
+0 = never, nil = infinitely.
+
+
+### LDAP configuration
 
 Instead of using passwords stored in the DB, an LDAP server can be used to authenticate users.
 This uses the [exldap](https://github.com/jmerriweather/exldap) package.
@@ -233,11 +275,6 @@ config :exldap, :settings,
   server: "my.ldap.server",
   port: 389,
   ssl: false
-```
-
-Add exldap to the list of deps in `mix.exs`:
-```elixir
-{:exldap, "~> 0.4"}
 ```
 
 ### User model and migrations differences
