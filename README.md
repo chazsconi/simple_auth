@@ -1,5 +1,7 @@
 # SimpleAuth
 
+**N.B. This version supports Phoenix 1.3-rc, but not Phoenix 1.2**
+
 Adds authentication and authorization to a Phoenix project.  It allows a user to login
 with a username and password held in the DB or alternatively authenticate against an LDAP server.
 
@@ -12,7 +14,7 @@ Add `simple_auth` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:simple_auth, "~> 1.5.1"}]
+  [{:simple_auth, "~> 1.5.1-rc"}]
 end
 ```
 

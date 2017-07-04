@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.5.1-rc
+* Other
+  * Supports Phoenix 1.3.0-rc
+
 ## v1.5.1
 
 * Enhancements

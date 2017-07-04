@@ -3,7 +3,7 @@ defmodule SimpleAuth.Mixfile do
 
   def project do
     [app: :simple_auth,
-     version: "1.5.1",
+     version: "1.5.1-rc",
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -24,7 +24,7 @@ defmodule SimpleAuth.Mixfile do
   end
 
   defp deps do
-    [{:phoenix, "~> 1.2.0"},
+    [{:phoenix, "~> 1.3.0-rc"},
     {:comeonin, "~> 3.0"},
     {:exldap, "~> 0.4"},
     {:ex_doc, ">= 0.0.0", only: :dev}]
