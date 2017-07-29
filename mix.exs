@@ -24,7 +24,7 @@ defmodule SimpleAuth.Mixfile do
   end
 
   defp deps do
-    [{:phoenix, "~> 1.2.0"},
+    [{:phoenix, "~> 1.2.0 or ~> 1.3.0"},
     {:comeonin, "~> 3.0"},
     {:exldap, "~> 0.4"},
     {:ex_doc, ">= 0.0.0", only: :dev}]
