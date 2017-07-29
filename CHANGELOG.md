@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.5.2
+
+* Enhancements
+ * Support Phoenix 1.3
+
 ## v1.5.1
 
 * Enhancements
