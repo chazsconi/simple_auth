@@ -11,5 +11,6 @@ defmodule SimpleAuth.LdapHelperAPI do
   Invoked when adding a new user.  The user struct can be enhanced with extra properties if required
   Returns the enhanced user struct
   """
-  @callback enhance_user(user :: term, connection :: term) :: term
+  @type option :: {:new_user, boolean}
+  @callback enhance_user(user :: term, connection :: term, [option]) :: term
 end
