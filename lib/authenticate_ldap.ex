@@ -5,15 +5,11 @@ defmodule SimpleAuth.Authenticate.Ldap do
   @behaviour SimpleAuth.AuthenticateAPI
   require Logger
 
-  @repo Application.get_env(:simple_auth, :repo)
-  @user_model Application.get_env(:simple_auth, :user_model)
-  @username_field Application.get_env(:simple_auth, :username_field) || :email
-  @ldap_helper Application.get_env(:simple_auth, :ldap_helper_module)
-
-  # This indirection prevents compiler warnings
-  defp repo, do: @repo
-  defp user_model, do: @user_model
-  defp ldap_helper, do: @ldap_helper
+  # Use functions to return values from runtime
+  defp repo, do: Application.get_env(:simple_auth, :repo)
+  defp user_model, do: Application.get_env(:simple_auth, :user_model)
+  defp ldap_helper, do: Application.get_env(:simple_auth, :ldap_helper_module)
+  defp username_field, do: Application.get_env(:simple_auth, :username_field) || :email
 
   @doc """
     Checks the user and password against the LDAP server.  If succeeds adds
@@ -36,12 +32,12 @@ defmodule SimpleAuth.Authenticate.Ldap do
   end
 
   defp get_or_insert_user(username, connection) do
-    case repo().get_by(user_model(), [{@username_field, username}]) do
+    case repo().get_by(user_model(), [{username_field(), username}]) do
       nil ->
         Logger.info "Adding user: #{username}"
         {:ok, user} =
           struct(user_model())
-          |> Map.put(@username_field, username)
+          |> Map.put(username_field(), username)
           |> ldap_helper().enhance_user(connection, new_user: true)
           |> user_model().changeset(%{})
           |> repo().insert()

@@ -9,23 +9,15 @@ end
 
 defmodule SimpleAuth.UserSession do
 
-  @after_compile __MODULE__
-
   @moduledoc "Wrapper to call the current implementation of the API"
   @behaviour SimpleAuth.UserSessionAPI
-  @user_session_api Application.get_env(:simple_auth, :user_session_api)
 
-  def get(conn),       do: @user_session_api.get(conn)
-  def put(conn, user), do: @user_session_api.put(conn, user)
-  def delete(conn),    do: @user_session_api.delete(conn)
-  def refresh(conn),   do: @user_session_api.refresh(conn)
-  def info(conn), do: @user_session_api.info(conn)
-
-  def __after_compile__(_env, _bytecode) do
-    IO.puts "simple_auth compiling with:"
-    IO.puts "@user_session_api = #{@user_session_api}"
-  end
-
+  defp user_session_api, do: Application.get_env(:simple_auth, :user_session_api)
+  def get(conn),       do: user_session_api().get(conn)
+  def put(conn, user), do: user_session_api().put(conn, user)
+  def delete(conn),    do: user_session_api().delete(conn)
+  def refresh(conn),   do: user_session_api().refresh(conn)
+  def info(conn), do: user_session_api().info(conn)
 end
 
 defmodule SimpleAuth.UserSession.HTTPSession do
