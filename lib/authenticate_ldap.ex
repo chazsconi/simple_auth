@@ -46,6 +46,7 @@ defmodule SimpleAuth.Authenticate.Ldap do
       user ->
         Logger.info "User already exists: #{user.id} #{username}"
         user
+        |> ldap_helper().enhance_user(connection, new_user: false)
     end
   end
 end

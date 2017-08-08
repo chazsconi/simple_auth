@@ -12,7 +12,7 @@ defmodule SimpleAuth.UserSession do
   @moduledoc "Wrapper to call the current implementation of the API"
   @behaviour SimpleAuth.UserSessionAPI
 
-  def user_session_api, do: Application.get_env(:simple_auth, :user_session_api)
+  defp user_session_api, do: Application.get_env(:simple_auth, :user_session_api)
   def get(conn),       do: user_session_api().get(conn)
   def put(conn, user), do: user_session_api().put(conn, user)
   def delete(conn),    do: user_session_api().delete(conn)

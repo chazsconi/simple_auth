@@ -7,7 +7,7 @@ defmodule SimpleAuth.AccessControl do
   import Plug.Conn
 
   defp error_view, do: Application.get_env(:simple_auth, :error_view)
-  @login_url Application.get_env(:simple_auth, :login_url) || "/login"
+  defp login_path, do; Application.get_env(:simple_auth, :login_url) || "/login"
 
   @doc "Plug to authorize and redirect if not authorized"
   def authorize(conn, roles) do
@@ -53,7 +53,7 @@ defmodule SimpleAuth.AccessControl do
   end
 
   defp redirect_to_login(conn) do
-    url = login_url(conn, @login_url)
+    url = login_url(conn, login_path())
     if String.first(url) == "/" do
       Phoenix.Controller.redirect(conn, to: url)
     else
