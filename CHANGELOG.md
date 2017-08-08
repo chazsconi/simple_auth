@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.5.3
+
+* Enhancements
+ * Provide additional parameter for LDAPHelper enhance_user to indicate if new user (breaking change)
+
 ## v1.5.2
 
 * Enhancements
