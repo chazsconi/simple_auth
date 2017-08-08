@@ -291,7 +291,7 @@ For example for the second example, create a module as follows:
 defmodule MyApp.LdapHelper do
   @behaviour SimpleAuth.LdapHelperAPI
   def build_ldap_user(username), do: "CN=#{username}"
-  def enhance_user(user, _connection), do: user
+  def enhance_user(user, _connection, _opts), do: user
 end
 ```
 
@@ -306,6 +306,22 @@ def enhance_user(%User{username: username}=user, connection) do
   {:ok, first_result} = search_results |> Enum.fetch(0)
   display_name = Exldap.search_attributes(first_result, "displayName")
   %User{user | display_name: display_name}
+end
+```
+
+The `enhance_user/3` function allows applying a different logic depending on the received opts.  Currently only `:new_user` is sent back,
+to allow distinguishing newly created users from already existent.
+
+```elixir
+def enhance_user(%User{username: username}=user, connection, opts) do
+  new_user = Keyword.get(opts, :new_user, false)
+  {:ok, search_results} = Exldap.search_field(connection, "dc=mycorp,dc=com", "sAMAccountName", username)
+  {:ok, first_result} = search_results |> Enum.fetch(0)
+  display_name = Exldap.search_attributes(first_result, "displayName")
+  %User{user | display_name: display_name}
+  if new_user do
+    # Something specific for new users
+  end
 end
 ```
 

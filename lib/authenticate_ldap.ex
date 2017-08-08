@@ -42,7 +42,7 @@ defmodule SimpleAuth.Authenticate.Ldap do
         {:ok, user} =
           struct(user_model())
           |> Map.put(@username_field, username)
-          |> ldap_helper().enhance_user(connection)
+          |> ldap_helper().enhance_user(connection, new_user: true)
           |> user_model().changeset(%{})
           |> repo().insert()
         Logger.info "Done id: #{user.id}"
@@ -50,6 +50,7 @@ defmodule SimpleAuth.Authenticate.Ldap do
       user ->
         Logger.info "User already exists: #{user.id} #{username}"
         user
+        |> ldap_helper().enhance_user(connection, new_user: false)
     end
   end
 end
