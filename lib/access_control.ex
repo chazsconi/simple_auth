@@ -6,7 +6,7 @@ defmodule SimpleAuth.AccessControl do
   require Logger
   import Plug.Conn
 
-  @error_view Application.get_env(:simple_auth, :error_view)
+  defp error_view, do: Application.get_env(:simple_auth, :error_view)
   @login_url Application.get_env(:simple_auth, :login_url) || "/login"
 
   @doc "Plug to authorize and redirect if not authorized"
@@ -32,7 +32,7 @@ defmodule SimpleAuth.AccessControl do
         else
           conn
           |> put_status(401)
-          |> Phoenix.Controller.render(@error_view, "401.html")
+          |> Phoenix.Controller.render(error_view(), "401.html")
           |> halt
         end
       end
