@@ -1,5 +1,11 @@
 # Changelog
 
+
+## v1.5.4
+
+* Enhancements
+ * Resolve config settings as run time rather than compile time
+
 ## v1.5.3
 
 * Enhancements
