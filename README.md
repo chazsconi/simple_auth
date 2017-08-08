@@ -319,8 +319,8 @@ def enhance_user(%User{username: username}=user, connection, opts) do
   {:ok, first_result} = search_results |> Enum.fetch(0)
   display_name = Exldap.search_attributes(first_result, "displayName")
   %User{user | display_name: display_name}
-  unless new_user do
-    # Something specific for already existing users
+  if new_user do
+    # Something specific for new users
   end
 end
 ```
