@@ -255,7 +255,12 @@ The number of times the user can refresh the session (setting the expiry back to
 ### LDAP configuration
 
 Instead of using passwords stored in the DB, an LDAP server can be used to authenticate users.
-This uses the [exldap](https://github.com/jmerriweather/exldap) package.
+This uses the [exldap](https://github.com/jmerriweather/exldap) package by default, but you can use your own by defining in the config.exs.
+```elixir
+config :simple_auth, :ldap_client, CustomLdapClient
+```
+
+This is useful for testing
 
 A User DB table is still used, but rows are automatically inserted for any new users logging in.
 

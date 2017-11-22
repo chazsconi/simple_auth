@@ -10,16 +10,17 @@ defmodule SimpleAuth.Authenticate.Ldap do
   defp user_model, do: Application.get_env(:simple_auth, :user_model)
   defp ldap_helper, do: Application.get_env(:simple_auth, :ldap_helper_module)
   defp username_field, do: Application.get_env(:simple_auth, :username_field) || :email
+  defp ldap_client, do: Application.get_env(:simple_auth, :ldap_client) || Exldap
 
   @doc """
     Checks the user and password against the LDAP server.  If succeeds adds
     the user to the DB if it is not there already
   """
   def login(username, password) do
-    {:ok, connection} = Exldap.open()
+    {:ok, connection} = ldap_client().open()
     user = ldap_helper().build_ldap_user(username)
     Logger.info "Checking LDAP credentials for user: #{user}"
-    verify_result = Exldap.verify_credentials(connection, user, password)
+    verify_result = ldap_client().verify_credentials(connection, user, password)
     result = case verify_result do
       :ok ->
         user = get_or_insert_user(username, connection)
@@ -27,7 +28,7 @@ defmodule SimpleAuth.Authenticate.Ldap do
       {:error, _} ->
         :error
     end
-    Exldap.close(connection)
+    ldap_client().close(connection)
     result
   end
 
