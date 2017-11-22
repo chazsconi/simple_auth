@@ -1,6 +1,11 @@
 # Changelog
 
 
+## v1.5.5
+
+* Enhancements
+ * Allow LDAP client to be overridden in config
+
 ## v1.5.4
 
 * Enhancements
