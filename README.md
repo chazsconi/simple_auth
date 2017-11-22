@@ -329,3 +329,10 @@ Point to this module in the config:
 ```elixir
 config :simple_auth, :ldap_helper_module, MyApp.LdapHelper
 ```
+
+### Testing
+By default the `Exldap` client is used, but you can use your own to provide an implementation for testing.
+
+```elixir
+config :simple_auth, :ldap_client, TestLdapClient
+```
