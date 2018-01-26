@@ -179,6 +179,12 @@ import SimpleAuth.AccessControl, only: [current_user: 1, logged_in?: 1, any_gran
 <% end %>
 ```
 
+### Check roles in controllers/contexts/models
+In a controller `any_granted?(conn, ["ROLE_ADMIN"])` can be used as the `conn` struct is available - this can
+be used for finer grained control if `plug :authorize` is not sufficient.
+
+Elsewhere, for example in a model or context, `any_granted?/2` can also be used passing the user struct.
+
 ### Add users to DB
 This can be done from iex
 ```elixir

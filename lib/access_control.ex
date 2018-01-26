@@ -5,6 +5,7 @@ defmodule SimpleAuth.AccessControl do
   alias SimpleAuth.UserSession
   require Logger
   import Plug.Conn
+  alias Plug.Conn
 
   defp error_view, do: Application.get_env(:simple_auth, :error_view)
   defp login_path, do: Application.get_env(:simple_auth, :login_url) || "/login"
@@ -86,22 +87,31 @@ defmodule SimpleAuth.AccessControl do
   def logged_in?(conn), do: !!current_user(conn)
 
   @doc "Get the current user's roles as a MapSet"
-  def roles(conn) do
-    case current_user(conn) do
+  def roles(%Conn{} = conn), do: roles(current_user(conn))
+
+  @doc "Get the user's roles as a MapSet"
+  def roles(user) do
+    case user do
       nil -> []
       user -> user.roles
     end
     |> MapSet.new
   end
 
-  @doc "Returns true if the current user has any of the given roles or the given role list is empty"
-  def any_granted?(_conn, []), do: true
-  def any_granted?(conn, check_roles) when is_list(check_roles) do
-      any_granted?(conn, MapSet.new(check_roles))
+  @doc """
+  Returns true if the current user in the connection or the passed user
+  has any of the given roles or the given role list is empty
+  """
+  def any_granted?(conn_or_user, check_roles)
+
+  def any_granted?(%Conn{} = conn, check_roles), do: any_granted?(current_user(conn), check_roles)
+
+  def any_granted?(_user, []), do: true
+  def any_granted?(user, check_roles) when is_list(check_roles) do
+    any_granted?(user, MapSet.new(check_roles))
   end
 
-  def any_granted?(conn, check_roles = %MapSet{}) do
-    MapSet.size(MapSet.intersection(check_roles, roles(conn))) > 0
+  def any_granted?(user, check_roles = %MapSet{}) do
+    MapSet.size(MapSet.intersection(check_roles, roles(user))) > 0
   end
-
 end
