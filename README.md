@@ -12,7 +12,7 @@ Add `simple_auth` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:simple_auth, "~> 1.5.1"}]
+  [{:simple_auth, "~> 1.5.6"}]
 end
 ```
 
@@ -20,11 +20,12 @@ end
 
 ### Add configuration
 ```elixir
-config :simple_auth, :error_view, MyApp.ErrorView
-config :simple_auth, :repo, MyApp.Repo
-config :simple_auth, :user_model, MyApp.User
-config :simple_auth, :username_field, :email  # field in User model and login form that user uses to login (default is :email)
-config :simple_auth, :user_session_api, SimpleAuth.UserSession.HTTPSession # See Advanced section for more options
+config :simple_auth,
+  error_view: MyApp.ErrorView,
+  repo: MyApp.Repo,
+  user_model: MyApp.User,
+  username_field: :email,  # field in User model and login form that user uses to login (default is :email)
+  user_session_api: SimpleAuth.UserSession.HTTPSession # See Advanced section for more options
 ```
 
 ### Create a user model
@@ -193,13 +194,30 @@ This can be done from iex
   roles: ["ROLE_ADMIN"]} |> MyProject.Repo.insert
 ```
 
+## Testing
+The User Session API `SimpleAuth.UserSession.Assigns` can be used in controller tests.
+
+Set it in `config/test.exs`
+```elixir
+config :simple_auth,
+  user_session_api: SimpleAuth.UserSession.Assigns
+```
+
+A user can be set in the connection, rather than in the session, as is the default, for example in the setup:
+```elixir
+setup do
+  {:ok, conn: SimpleAuth.UserSession.put(build_conn(), %User{email: "joe.bloggs@gmail.com", roles:["ROLE_ADMIN"]}}
+end
+```
+Not setting a user simulates no user being logged in.
+
 ## Advanced Use
 
 ### User Session Storage
 
 The simplest storage for the User Session is
 ```elixir
-config :simple_auth, :user_session_api, SimpleAuth.UserSession.HTTPSession
+config :simple_auth, user_session_api: SimpleAuth.UserSession.HTTPSession
 ```
 which stores the session in `Plug.Conn` session.  However the following other implementations
 are available:
@@ -207,7 +225,7 @@ are available:
   user_id stored in the `Plug.Conn` session.  Logging out for a given user will kill all
   that user's sessions and provides a callback that can be invoked on session expiry.
 * `SimpleAuth.UserSession.Assigns` - A version that can be used in tests which puts the user
-  in `conn.assigns`.
+  in `conn.assigns` (See above).
 
 ####  UserSession.Memory additional api endpoints
 `SimpleAuth.UserSession.Memory` supports these additional endpoints.
@@ -336,7 +354,7 @@ Point to this module in the config:
 config :simple_auth, :ldap_helper_module, MyApp.LdapHelper
 ```
 
-### Testing
+### LDAP Testing
 By default the `Exldap` client is used, but you can use your own to provide an implementation for testing.
 
 ```elixir
