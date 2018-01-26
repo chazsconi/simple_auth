@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.5.6
+
+* Enhancements
+ * Provide `AccessControl.roles/1` and `AccessControl.any_granted?/2` that take a `User` struct
 
 ## v1.5.5
 
