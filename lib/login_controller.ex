@@ -21,7 +21,7 @@ defmodule SimpleAuth.LoginController do
             conn
             |> UserSession.put(user)
             |> put_flash(:info, "Logged in")
-            |> redirect(to: "/")
+            |> redirect(to: post_login_path())
           :error ->
             conn
             |> put_flash(:info, "Invalid credentials")
@@ -63,8 +63,11 @@ defmodule SimpleAuth.LoginController do
         conn
         |> UserSession.delete
         |> put_flash(:info, "Logged out")
-        |> redirect(to: "/")
+        |> redirect(to: post_logout_path())
       end
+
+      defp post_login_path, do: Application.get_env(:simple_auth, :post_login_path)
+      defp post_logout_path, do: Application.get_env(:simple_auth, :post_logout_path)
 
       @doc "Called when the user is successfully logged in"
       def on_login_success(_conn, _user, _password), do: :ok

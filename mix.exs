@@ -20,7 +20,12 @@ defmodule SimpleAuth.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [mod: {SimpleAuth, []},
-     applications: [:logger]]
+     applications: [:logger],
+     env: [
+      post_login_path: "/",
+      post_logout_path: "/"
+     ]
+   ]
   end
 
   defp deps do
