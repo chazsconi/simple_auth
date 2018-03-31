@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.5.7
+
+* Enhancements
+ * Provide `:post_login_path` and `:post_logout_path` config options
+
 ## v1.5.6
 
 * Enhancements

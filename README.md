@@ -12,7 +12,7 @@ Add `simple_auth` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:simple_auth, "~> 1.5.6"}]
+  [{:simple_auth, "~> 1.5.7"}]
 end
 ```
 
