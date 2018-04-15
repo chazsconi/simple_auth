@@ -21,9 +21,14 @@ defmodule SimpleAuth.Mixfile do
   def application do
     [mod: {SimpleAuth, []},
      applications: [:logger],
+     # Default config
      env: [
+      login_url: "/login",
       post_login_path: "/",
-      post_logout_path: "/"
+      post_logout_path: "/",
+      authenticate_api: SimpleAuth.Authenticate.Repo,
+      username_field: :email,
+      ldap_client: Exldap
      ]
    ]
   end
