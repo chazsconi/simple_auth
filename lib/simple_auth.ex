@@ -1,6 +1,10 @@
 defmodule SimpleAuth do
   use Application
-  require Logger
+
+  # The application is needed in case the UserSession.Memory is used. As the OTP behaviour
+  # for the Application start callback requires the `{:ok, pid}` to be returned, the supervisor
+  # is still started even if it has nothing to supervise.
+
   defp user_session_api(), do: Application.get_env(:simple_auth, :user_session_api)
 
   def start(_type, _args) do
@@ -11,8 +15,6 @@ defmodule SimpleAuth do
         SimpleAuth.UserSession.Memory ->
           [worker(SimpleAuth.UserSession.Memory, [])]
         _ ->
-        Logger.warn "The SimpleAuth application does not need to be started for this API. "
-                    <> "Remove it from your list of applications."
           []
       end
 
