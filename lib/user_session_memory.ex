@@ -5,7 +5,7 @@ defmodule SimpleAuth.UserSession.Memory do
   It also causes one user logout to logout all other users.
   """
   @behaviour SimpleAuth.UserSessionAPI
-  @session_refresh_limit Application.get_env(:simple_auth, :session_refresh_limit)
+  defp session_refresh_limit(), do: Application.get_env(:simple_auth, :session_refresh_limit)
 
   def start_link do
     {:ok, _} = GenServer.start_link(SimpleAuth.UserSession.MemoryGenServer, nil, name: __MODULE__)
@@ -63,20 +63,20 @@ defmodule SimpleAuth.UserSession.Memory do
       can_refresh?:  can_refresh?(session.refreshes)}
   end
 
-  def can_refresh?(refreshes), do: refreshes < @session_refresh_limit
+  def can_refresh?(refreshes), do: refreshes < session_refresh_limit()
 end
 
 defmodule SimpleAuth.UserSession.MemoryGenServer do
   use GenServer
   require Logger
-  @expiry_callback Application.get_env(:simple_auth, :expiry_callback)
-  @session_expiry_seconds Application.get_env(:simple_auth, :session_expiry_seconds)
+  defp expiry_callback(), do: Application.get_env(:simple_auth, :expiry_callback)
+  defp session_expiry_seconds(), do: Application.get_env(:simple_auth, :session_expiry_seconds)
   @expired_check_interval_seconds 1
 
   defstruct user: nil, expiry: nil, refreshes: 0
 
   def init(_opts) do
-    Logger.info "Starting session server expiry_callback: #{inspect @expiry_callback}"
+    Logger.info "Starting session server expiry_callback: #{inspect expiry_callback()}"
     sessions =
       %{}
       |> check_expired_sessions # to cause the regular timer to start
@@ -93,7 +93,7 @@ defmodule SimpleAuth.UserSession.MemoryGenServer do
       nil ->
         {:reply, :expired, sessions}
       session ->
-        expiry = (DateTime.utc_now |> DateTime.to_unix) + @session_expiry_seconds
+        expiry = (DateTime.utc_now |> DateTime.to_unix) + session_expiry_seconds()
         if SimpleAuth.UserSession.Memory.can_refresh?(session.refreshes) do
           session = %__MODULE__{session |
             expiry: expiry,
@@ -107,14 +107,14 @@ defmodule SimpleAuth.UserSession.MemoryGenServer do
   end
 
   def handle_call({:put, %{id: user_id}=user}, _from, sessions) do
-    expiry = (DateTime.utc_now |> DateTime.to_unix) + @session_expiry_seconds
+    expiry = (DateTime.utc_now |> DateTime.to_unix) + session_expiry_seconds()
     sessions = Map.put(sessions, user_id, %__MODULE__{user: user, expiry: expiry})
     Logger.info "Added session. sessions: #{inspect sessions}"
     {:reply, :ok, sessions}
   end
 
   def handle_call({:delete, user_id}, _from, sessions) do
-    invoke_expiry_callback(@expiry_callback, user_id)
+    invoke_expiry_callback(expiry_callback(), user_id)
     sessions = Map.delete(sessions, user_id)
     Logger.info "Deleted session. sessions: #{inspect sessions}"
     {:reply, :ok, sessions}
@@ -131,7 +131,7 @@ defmodule SimpleAuth.UserSession.MemoryGenServer do
           now = DateTime.utc_now |> DateTime.to_unix
           if now > session.expiry do
             Logger.info "Session #{user_id} expired"
-            invoke_expiry_callback(@expiry_callback, user_id)
+            invoke_expiry_callback(expiry_callback(), user_id)
             false
           else
             true

@@ -8,7 +8,7 @@ defmodule SimpleAuth.AccessControl do
   alias Plug.Conn
 
   defp error_view, do: Application.get_env(:simple_auth, :error_view)
-  defp login_path, do: Application.get_env(:simple_auth, :login_url) || "/login"
+  defp login_path, do: Application.get_env(:simple_auth, :login_url)
 
   @doc "Plug to authorize and redirect if not authorized"
   def authorize(conn, roles) do

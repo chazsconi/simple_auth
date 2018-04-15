@@ -9,8 +9,8 @@ defmodule SimpleAuth.Authenticate.Ldap do
   defp repo, do: Application.get_env(:simple_auth, :repo)
   defp user_model, do: Application.get_env(:simple_auth, :user_model)
   defp ldap_helper, do: Application.get_env(:simple_auth, :ldap_helper_module)
-  defp username_field, do: Application.get_env(:simple_auth, :username_field) || :email
-  defp ldap_client, do: Application.get_env(:simple_auth, :ldap_client) || Exldap
+  defp username_field, do: Application.get_env(:simple_auth, :username_field)
+  defp ldap_client, do: Application.get_env(:simple_auth, :ldap_client)
 
   @doc """
     Checks the user and password against the LDAP server.  If succeeds adds

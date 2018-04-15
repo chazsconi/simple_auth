@@ -3,19 +3,17 @@ defmodule SimpleAuth.Authenticate.Repo do
   Implementation that checks authenticates user against a database with a username/password
   """
   @max_attempts 3
-  @repo Application.get_env(:simple_auth, :repo)
-  @user_model Application.get_env(:simple_auth, :user_model)
-  @username_field Application.get_env(:simple_auth, :username_field) || :email
-  @behaviour SimpleAuth.AuthenticateAPI
 
-  # This indirection prevents compiler warnings
-  defp repo, do: @repo
-  defp user_model, do: @user_model
+  defp repo, do: Application.get_env(:simple_auth, :repo)
+  defp user_model, do: Application.get_env(:simple_auth, :user_model)
+  defp username_field, do: Application.get_env(:simple_auth, :username_field)
+
+  @behaviour SimpleAuth.AuthenticateAPI
 
   @doc "Checks login details against user table.  Returns {:ok, user} or :error"
   def login(username, password) do
 
-    user = repo().get_by(user_model(), [{@username_field, username}])
+    user = repo().get_by(user_model(), [{username_field(), username}])
     case authenticate(user, password) do
       true ->
         repo().update(user_model().changeset(user, %{attempts: 0}))
