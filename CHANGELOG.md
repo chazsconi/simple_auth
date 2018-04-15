@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.5.8
+
+* Bug fixes
+ * Resolve config options at runtime not compile time
+* Other
+ * Set default config in `mix.exs` not in code
+ * Remove warning message logged at startup if not using UserSession.Memory
+
 ## v1.5.7
 
 * Enhancements
