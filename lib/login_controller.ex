@@ -10,7 +10,7 @@ defmodule SimpleAuth.LoginController do
 
       @doc "Shows the login page"
       def show(conn, _params) do
-        render conn, "login.html"
+        render(conn, "login.html")
       end
 
       @doc "Handles submit to the login page with username/password"
@@ -21,14 +21,17 @@ defmodule SimpleAuth.LoginController do
         case authenticate_api().login(username, password) do
           {:ok, user} ->
             :ok = on_login_success(conn, user, password)
+
             conn
             |> UserSession.put(user)
             |> put_flash(:info, "Logged in")
             |> redirect(to: post_login_path())
+
           :error ->
             conn
             |> put_flash(:info, "Invalid credentials")
             |> render("login.html")
+
           :blocked ->
             conn
             |> put_flash(:info, "User is blocked")
@@ -51,20 +54,22 @@ defmodule SimpleAuth.LoginController do
       defp respond_with_user_session_info(conn, fun) do
         response =
           case fun.(conn) do
-            :expired
-              -> %{"status" => "expired"}
-            {:ok, %{remaining_seconds: seconds, can_refresh?: can_refresh?}}
-              -> %{"status" => "ok", "remainingSeconds" => seconds,
-                "canRefresh" => can_refresh?}
+            :expired ->
+              %{"status" => "expired"}
+
+            {:ok, %{remaining_seconds: seconds, can_refresh?: can_refresh?}} ->
+              %{"status" => "ok", "remainingSeconds" => seconds, "canRefresh" => can_refresh?}
           end
+
         conn
         |> json(response)
       end
 
       def logout(conn, _) do
         :ok = on_logout(conn, UserSession.get(conn))
+
         conn
-        |> UserSession.delete
+        |> UserSession.delete()
         |> put_flash(:info, "Logged out")
         |> redirect(to: post_logout_path())
       end
@@ -78,7 +83,7 @@ defmodule SimpleAuth.LoginController do
       @doc "Called when the user is successfully logged in"
       def on_logout(_conn, _user), do: :ok
 
-      defoverridable [on_login_success: 3, on_logout: 2]
+      defoverridable on_login_success: 3, on_logout: 2
     end
   end
 end

@@ -14,6 +14,7 @@ defmodule SimpleAuth do
       case user_session_api() do
         SimpleAuth.UserSession.Memory ->
           [worker(SimpleAuth.UserSession.Memory, [])]
+
         _ ->
           []
       end

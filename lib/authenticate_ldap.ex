@@ -19,15 +19,19 @@ defmodule SimpleAuth.Authenticate.Ldap do
   def login(username, password) do
     {:ok, connection} = ldap_client().open()
     user = ldap_helper().build_ldap_user(username)
-    Logger.info "Checking LDAP credentials for user: #{user}"
+    Logger.info("Checking LDAP credentials for user: #{user}")
     verify_result = ldap_client().verify_credentials(connection, user, password)
-    result = case verify_result do
-      :ok ->
-        user = get_or_insert_user(username, connection)
-        {:ok, user}
-      {:error, _} ->
-        :error
-    end
+
+    result =
+      case verify_result do
+        :ok ->
+          user = get_or_insert_user(username, connection)
+          {:ok, user}
+
+        {:error, _} ->
+          :error
+      end
+
     ldap_client().close(connection)
     result
   end
@@ -35,17 +39,21 @@ defmodule SimpleAuth.Authenticate.Ldap do
   defp get_or_insert_user(username, connection) do
     case repo().get_by(user_model(), [{username_field(), username}]) do
       nil ->
-        Logger.info "Adding user: #{username}"
+        Logger.info("Adding user: #{username}")
+
         {:ok, user} =
           struct(user_model())
           |> Map.put(username_field(), username)
           |> ldap_helper().enhance_user(connection, new_user: true)
           |> user_model().changeset(%{})
           |> repo().insert()
-        Logger.info "Done id: #{user.id}"
+
+        Logger.info("Done id: #{user.id}")
         user
+
       user ->
-        Logger.info "User already exists: #{user.id} #{username}"
+        Logger.info("User already exists: #{user.id} #{username}")
+
         user
         |> ldap_helper().enhance_user(connection, new_user: false)
     end

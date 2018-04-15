@@ -13,7 +13,8 @@ defmodule SimpleAuth.AccessControl do
   @doc "Plug to authorize and redirect if not authorized"
   def authorize(conn, roles) do
     if !logged_in?(conn) do
-      Logger.info "Not logged in"
+      Logger.info("Not logged in")
+
       if conn.private[:simple_auth_no_redirect_on_unauthorized] do
         conn
         |> text_unauthorized()
@@ -26,7 +27,8 @@ defmodule SimpleAuth.AccessControl do
       if any_granted?(conn, roles) do
         conn
       else
-        Logger.info "Not authorized"
+        Logger.info("Not authorized")
+
         if conn.private[:simple_auth_no_redirect_on_unauthorized] do
           conn
           |> text_unauthorized()
@@ -55,6 +57,7 @@ defmodule SimpleAuth.AccessControl do
 
   defp redirect_to_login(conn) do
     url = login_url(conn, login_path())
+
     if String.first(url) == "/" do
       Phoenix.Controller.redirect(conn, to: url)
     else
@@ -95,7 +98,7 @@ defmodule SimpleAuth.AccessControl do
       nil -> []
       user -> user.roles
     end
-    |> MapSet.new
+    |> MapSet.new()
   end
 
   @doc """
@@ -107,6 +110,7 @@ defmodule SimpleAuth.AccessControl do
   def any_granted?(%Conn{} = conn, check_roles), do: any_granted?(current_user(conn), check_roles)
 
   def any_granted?(_user, []), do: true
+
   def any_granted?(user, check_roles) when is_list(check_roles) do
     any_granted?(user, MapSet.new(check_roles))
   end
