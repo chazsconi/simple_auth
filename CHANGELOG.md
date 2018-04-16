@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.6.0
+
+* Other
+ * Make `exldap` an optional dependency.  If you use the `SimpleAuth.Authenticate.Ldap` authenticate_api you must include
+ the dependency explicitly in your project. See `README.md` for details.
+ * Document additional config parameters.
+
 ## v1.5.8
 
 * Bug fixes
