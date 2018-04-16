@@ -213,6 +213,14 @@ Not setting a user simulates no user being logged in.
 
 ## Advanced Use
 
+### Additional Config options
+
+The following additional config options are available:
+
+  * `login_url` - path to redirect to when a user is not logged and tries to access a protected resource. Defaults to "/login".
+  * `post_login_path` - Path to redirect to after a successful login.  Defaults to "/".
+  * `post_logout_path` - path to redirect to after logout.  Defaults to "/".
+
 ### User Session Storage
 
 The simplest storage for the User Session is
@@ -285,6 +293,17 @@ A User DB table is still used, but rows are automatically inserted for any new u
 
 To use LDAP do the same as the basic configuration (apart from the user model and migrations - see below)
 and also do the following:
+
+### Add ExLdap dependency
+
+Add `exldap` as an additional dependency in your `mix.exs`
+```elixir
+def deps do
+  ...
+  {:exldap, "~> 0.4"},
+  ...
+end
+```
 
 ### Add configuration
 To use LDAP add the following additional entry to the config:
