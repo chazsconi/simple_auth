@@ -29,6 +29,10 @@ defmodule SimpleAuth.UserSession.Memory do
     Plug.Conn.put_session(conn, :user_id, user.id)
   end
 
+  def delete(user_id) when is_integer(user_id) do
+    :ok = GenServer.call(__MODULE__, {:delete, user_id})
+  end
+
   def delete(conn) do
     case Plug.Conn.get_session(conn, :user_id) do
       nil ->
