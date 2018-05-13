@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.6.1
+
+* Enhancements
+ * `UserSession.Memory.delete/1` now accepts `user_id` or `conn` as a parameter.
+
 ## v1.6.0
 
 * Other
