@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.7.0
+
+* Enhancements
+ * Add `transform_user/2` callback to `LoginController`
+
 ## v1.6.1
 
 * Enhancements
