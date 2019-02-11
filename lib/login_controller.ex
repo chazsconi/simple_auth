@@ -23,7 +23,7 @@ defmodule SimpleAuth.LoginController do
             :ok = on_login_success(conn, user, password)
 
             conn
-            |> UserSession.put(user)
+            |> UserSession.put(transform_user(conn, user))
             |> put_flash(:info, "Logged in")
             |> redirect(to: post_login_path())
 
@@ -83,7 +83,10 @@ defmodule SimpleAuth.LoginController do
       @doc "Called when the user is successfully logged in"
       def on_logout(_conn, _user), do: :ok
 
-      defoverridable on_login_success: 3, on_logout: 2
+      @doc "Allows the user struct/map to be transformed before saving in the session"
+      def transform_user(_conn, user), do: user
+
+      defoverridable on_login_success: 3, on_logout: 2, transform_user: 2
     end
   end
 end

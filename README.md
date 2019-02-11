@@ -93,11 +93,18 @@ defmodule MyProject.LoginController do
   def on_logout(conn, user) do
     # additional logout logic here
   end
+
+  # optional callback
+  def transform_user(conn, user) do
+    # transform the user that is retrieved from the repo before storing in the session
+    user
+  end
 end
 ```
 
-The two callbacks `on_login_success/3` and `on_logout/2` can be optionally implemented if
-additional logic is required - e.g. logging the user's login/logout times to a DB
+The callbacks `on_login_success/3`, `on_logout/2` and `transform_user/2` can be optionally
+implemented if additional logic is required - e.g. logging the user's login/logout times to a DB
+or, in the case of `transform_user/2`, changing the user struct/map type that is stored in the session.
 
 ### Add the routes to the router
 ```elixir
