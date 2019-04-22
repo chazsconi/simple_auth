@@ -12,6 +12,9 @@ defmodule SimpleAuth.Authenticate.Ldap do
   defp username_field, do: Application.get_env(:simple_auth, :username_field)
   defp ldap_client, do: Application.get_env(:simple_auth, :ldap_client)
 
+  defp allow_unknown_users?,
+    do: Application.get_env(:simple_auth, :ldap_allow_unknown_users, true)
+
   @doc """
     Checks the user and password against the LDAP server.  If succeeds adds
     the user to the DB if it is not there already
@@ -25,8 +28,18 @@ defmodule SimpleAuth.Authenticate.Ldap do
     result =
       case verify_result do
         :ok ->
-          user = get_or_insert_user(username, connection)
-          {:ok, user}
+          if allow_unknown_users?() do
+            user = get_or_insert_user(username, connection)
+            {:ok, user}
+          else
+            case get_user(username) do
+              nil ->
+                :error
+
+              user ->
+                {:ok, user}
+            end
+          end
 
         {:error, _} ->
           :error
@@ -36,8 +49,12 @@ defmodule SimpleAuth.Authenticate.Ldap do
     result
   end
 
+  defp get_user(username) do
+    repo().get_by(user_model(), [{username_field(), username}])
+  end
+
   defp get_or_insert_user(username, connection) do
-    case repo().get_by(user_model(), [{username_field(), username}]) do
+    case get_user(username) do
       nil ->
         Logger.info("Adding user: #{username}")
 
