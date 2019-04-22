@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.8.0
+
+* Enhancements
+ * Support Phoenix 1.4, remove Phoenix 1.2 support
+
 ## v1.7.0
 
 * Enhancements
