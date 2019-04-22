@@ -35,7 +35,8 @@ defmodule SimpleAuth.AccessControl do
         else
           conn
           |> put_status(401)
-          |> Phoenix.Controller.render(error_view(), "401.html")
+          |> Phoenix.Controller.put_view(error_view())
+          |> Phoenix.Controller.render("401.html")
           |> halt
         end
       end
