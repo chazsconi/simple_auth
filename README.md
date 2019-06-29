@@ -34,6 +34,7 @@ In this example we are using an Account context
 defmodule MyProject.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
+  alias MyProject.Accounts.User
 
   schema "users" do
     field :email, :string # Must match the field name specified in :username_field config setting
@@ -46,7 +47,7 @@ defmodule MyProject.Accounts.User do
     timestamps
   end
 
-  def changeset(user, attrs) do
+  def changeset(%User{} = user, attrs) do
     user
     |> cast(attrs, [:email, :crypted_password, :attempts, :attempted_at])
     |> validate_required([:email, :crypted_password, :attempts])
@@ -124,7 +125,7 @@ end
 ### Create a login template
 In `login/login.html.eex`
 ```elixir
-<%= form_for @conn, login_path(@conn, :login), [as: :credentials], fn f -> %>
+<%= form_for @conn, Routes.login_path(@conn, :login), [as: :credentials], fn f -> %>
   <div class="form-group">
     <label>Email</label>
     <%= text_input f, :email, class: "form-control" %>
@@ -166,7 +167,7 @@ end
 This will return just a status code of 401 in the case the user is not logged in or not authorized.
 
 ### Give access to helper functions in view
-In `web.ex` add this in the view macro:
+In `my_project_web.ex` add this in the view macro:
 ```elixir
 import SimpleAuth.AccessControl, only: [current_user: 1, logged_in?: 1, any_granted?: 2]
 ```
@@ -308,7 +309,7 @@ Add `exldap` as an additional dependency in your `mix.exs`
 ```elixir
 def deps do
   ...
-  {:exldap, "~> 0.4"},
+  {:exldap, "~> 0.6"},
   ...
 end
 ```
@@ -327,8 +328,8 @@ config :exldap, :settings,
   ssl: false
 ```
 
-### User model and migrations differences
-Create a user model and migrations (as above) but only include the `username`, `roles` and timestamp columns.
+### User context and migrations differences
+Create a user context and migrations (as above) but only include the `username`, `roles` and timestamp columns.
 Passwords and blocking of users should be handled by the LDAP server.
 
 ### Create helper module
