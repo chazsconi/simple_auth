@@ -28,13 +28,13 @@ config :simple_auth,
   user_session_api: SimpleAuth.UserSession.HTTPSession # See Advanced section for more options
 ```
 
-### Create a user context
+### Create a user schema
 In this example we are using an Account context
 ```elixir
 defmodule MyProject.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
-  alias MyProject.Accounts.User
+  alias __MODULE__
 
   schema "users" do
     field :email, :string # Must match the field name specified in :username_field config setting
@@ -189,11 +189,11 @@ import SimpleAuth.AccessControl, only: [current_user: 1, logged_in?: 1, any_gran
 <% end %>
 ```
 
-### Check roles in controllers/contexts/models
+### Check roles in controllers/contexts
 In a controller `any_granted?(conn, ["ROLE_ADMIN"])` can be used as the `conn` struct is available - this can
 be used for finer grained control if `plug :authorize` is not sufficient.
 
-Elsewhere, for example in a model or context, `any_granted?/2` can also be used passing the user struct.
+Elsewhere, for example in a context, `any_granted?/2` can also be used passing the user struct.
 
 ### Add users to DB
 This can be done from iex
@@ -328,8 +328,8 @@ config :exldap, :settings,
   ssl: false
 ```
 
-### User context and migrations differences
-Create a user context and migrations (as above) but only include the `username`, `roles` and timestamp columns.
+### User schema and migrations differences
+Create a user schema and migrations (as above) but only include the `username`, `roles` and timestamp columns.
 Passwords and blocking of users should be handled by the LDAP server.
 
 ### Create helper module
