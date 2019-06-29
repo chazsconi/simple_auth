@@ -12,13 +12,13 @@ Add `simple_auth` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:simple_auth, "~> 1.6.0"}]
+  [{:simple_auth, "~> 1.8.0"}]
 end
 ```
 
 ## Basic Use
 
-### Add configuration
+### Add configuration config/config.exs
 ```elixir
 config :simple_auth,
   error_view: MyApp.ErrorView,
@@ -28,11 +28,12 @@ config :simple_auth,
   user_session_api: SimpleAuth.UserSession.HTTPSession # See Advanced section for more options
 ```
 
-### Create a user model
-
+### Create a user context
+In this example we are using an Account context
 ```elixir
-defmodule MyProject.User do
-  use MyProject.Web, :model
+defmodule MyProject.Accounts.User do
+  use Ecto.Schema
+  import Ecto.Changeset
 
   schema "users" do
     field :email, :string # Must match the field name specified in :username_field config setting
@@ -45,9 +46,9 @@ defmodule MyProject.User do
     timestamps
   end
 
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, [:email, :crypted_password, :attempts, :attempted_at])
+  def changeset(user, attrs) do
+    user
+    |> cast(attrs, [:email, :crypted_password, :attempts, :attempted_at])
     |> validate_required([:email, :crypted_password, :attempts])
     |> unique_constraint(:email)
     |> validate_format(:email, ~r/@/)
@@ -68,7 +69,7 @@ def change do
     add :crypted_password, :string
     add :roles, {:array, :string}
     add :attempts, :integer
-    add :attempted_at, :datetime, null: true
+    add :attempted_at, :naive_datetime, null: true
 
     timestamps
   end
@@ -79,8 +80,8 @@ end
 ### Add a login controller
 
 ```elixir
-defmodule MyProject.LoginController do
-  use MyProject.Web, :controller
+defmodule MyProjectWeb.LoginController do
+  use MyProjectWeb, :controller
   # Import login methods
   use SimpleAuth.LoginController
 
@@ -116,7 +117,7 @@ delete "/logout", LoginController, :logout
 ### Add a login view
 ```elixir
 defmodule MyProject.LoginView do
-  use MyProject.Web, :view
+  use MyProjectWeb, :view
 end
 ```
 
