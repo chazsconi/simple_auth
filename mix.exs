@@ -5,7 +5,7 @@ defmodule SimpleAuth.Mixfile do
     [
       app: :simple_auth,
       version: "1.8.0",
-      elixir: "~> 1.3",
+      elixir: "~> 1.4",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       description: description(),
@@ -23,7 +23,7 @@ defmodule SimpleAuth.Mixfile do
   def application do
     [
       mod: {SimpleAuth, []},
-      applications: [:logger],
+      extra_applications: [:logger],
       # Default config
       env: [
         login_url: "/login",
