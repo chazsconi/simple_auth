@@ -41,7 +41,9 @@ defmodule SimpleAuth.Mixfile do
       {:phoenix, "~> 1.3.0 or ~> 1.4.0"},
       {:comeonin, "~> 3.0"},
       {:exldap, "~> 0.4", optional: true},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      # Include poison so can run tests (if there were some) as Phoenix needs a JSON library to run
+      {:poison, ">= 0.0.0", only: :test}
     ]
   end
 
