@@ -296,7 +296,8 @@ The number of times the user can refresh the session (setting the expiry back to
 Instead of using passwords stored in the DB, an LDAP server can be used to authenticate users.
 This uses the [exldap](https://github.com/jmerriweather/exldap) package.
 
-A User DB table is still used, but rows are automatically inserted for any new users logging in.
+A User DB table is still used, but rows are automatically inserted for any new users logging in (although
+this can be disabled - see below).
 
 To use LDAP do the same as the basic configuration (apart from the user model and migrations - see below)
 and also do the following:
@@ -324,6 +325,14 @@ config :exldap, :settings,
   server: "my.ldap.server",
   port: 389,
   ssl: false
+```
+
+By default unknown users are automatically added to the user table on login.  If you want
+to forbid unknown users and only allow access to users that been previously been added
+(e.g. by some admin process), then set the following:
+
+```elixir
+config :simple_auth, ldap_allow_unknown_users: false
 ```
 
 ### User model and migrations differences
