@@ -29,7 +29,7 @@ config :simple_auth,
 ```
 
 ### Create a user schema
-In this example we are using an Account context
+In this example we are using an Accounts context
 ```elixir
 defmodule MyProject.Accounts.User do
   use Ecto.Schema
