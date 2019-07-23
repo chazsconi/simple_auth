@@ -18,7 +18,7 @@ end
 
 ## Basic Use
 
-### Add configuration
+### Add configuration config/config.exs
 ```elixir
 config :simple_auth,
   error_view: MyApp.ErrorView,
@@ -28,11 +28,13 @@ config :simple_auth,
   user_session_api: SimpleAuth.UserSession.HTTPSession # See Advanced section for more options
 ```
 
-### Create a user model
-
+### Create a user schema
+In this example we are using an Accounts context
 ```elixir
-defmodule MyProject.User do
-  use MyProject.Web, :model
+defmodule MyProject.Accounts.User do
+  use Ecto.Schema
+  import Ecto.Changeset
+  alias __MODULE__
 
   schema "users" do
     field :email, :string # Must match the field name specified in :username_field config setting
@@ -45,9 +47,9 @@ defmodule MyProject.User do
     timestamps
   end
 
-  def changeset(model, params \\ :empty) do
-    model
-    |> cast(params, [:email, :crypted_password, :attempts, :attempted_at])
+  def changeset(%User{} = user, attrs) do
+    user
+    |> cast(attrs, [:email, :crypted_password, :attempts, :attempted_at])
     |> validate_required([:email, :crypted_password, :attempts])
     |> unique_constraint(:email)
     |> validate_format(:email, ~r/@/)
@@ -68,7 +70,7 @@ def change do
     add :crypted_password, :string
     add :roles, {:array, :string}
     add :attempts, :integer
-    add :attempted_at, :datetime, null: true
+    add :attempted_at, :naive_datetime, null: true
 
     timestamps
   end
@@ -79,8 +81,8 @@ end
 ### Add a login controller
 
 ```elixir
-defmodule MyProject.LoginController do
-  use MyProject.Web, :controller
+defmodule MyProjectWeb.LoginController do
+  use MyProjectWeb, :controller
   # Import login methods
   use SimpleAuth.LoginController
 
@@ -116,14 +118,14 @@ delete "/logout", LoginController, :logout
 ### Add a login view
 ```elixir
 defmodule MyProject.LoginView do
-  use MyProject.Web, :view
+  use MyProjectWeb, :view
 end
 ```
 
 ### Create a login template
 In `login/login.html.eex`
 ```elixir
-<%= form_for @conn, login_path(@conn, :login), [as: :credentials], fn f -> %>
+<%= form_for @conn, Routes.login_path(@conn, :login), [as: :credentials], fn f -> %>
   <div class="form-group">
     <label>Email</label>
     <%= text_input f, :email, class: "form-control" %>
@@ -165,7 +167,7 @@ end
 This will return just a status code of 401 in the case the user is not logged in or not authorized.
 
 ### Give access to helper functions in view
-In `web.ex` add this in the view macro:
+In `my_project_web.ex` add this in the view macro:
 ```elixir
 import SimpleAuth.AccessControl, only: [current_user: 1, logged_in?: 1, any_granted?: 2]
 ```
@@ -187,11 +189,11 @@ import SimpleAuth.AccessControl, only: [current_user: 1, logged_in?: 1, any_gran
 <% end %>
 ```
 
-### Check roles in controllers/contexts/models
+### Check roles in controllers/contexts
 In a controller `any_granted?(conn, ["ROLE_ADMIN"])` can be used as the `conn` struct is available - this can
 be used for finer grained control if `plug :authorize` is not sufficient.
 
-Elsewhere, for example in a model or context, `any_granted?/2` can also be used passing the user struct.
+Elsewhere, for example in a context, `any_granted?/2` can also be used passing the user struct.
 
 ### Add users to DB
 This can be done from iex
@@ -308,7 +310,7 @@ Add `exldap` as an additional dependency in your `mix.exs`
 ```elixir
 def deps do
   ...
-  {:exldap, "~> 0.4"},
+  {:exldap, "~> 0.6"},
   ...
 end
 ```
@@ -327,16 +329,8 @@ config :exldap, :settings,
   ssl: false
 ```
 
-By default unknown users are automatically added to the user table on login.  If you want
-to forbid unknown users and only allow access to users that been previously been added
-(e.g. by some admin process), then set the following:
-
-```elixir
-config :simple_auth, ldap_allow_unknown_users: false
-```
-
-### User model and migrations differences
-Create a user model and migrations (as above) but only include the `username`, `roles` and timestamp columns.
+### User schema and migrations differences
+Create a user schema and migrations (as above) but only include the `username`, `roles` and timestamp columns.
 Passwords and blocking of users should be handled by the LDAP server.
 
 ### Create helper module
