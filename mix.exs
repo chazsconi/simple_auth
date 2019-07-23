@@ -4,8 +4,8 @@ defmodule SimpleAuth.Mixfile do
   def project do
     [
       app: :simple_auth,
-      version: "1.8.0",
-      elixir: "~> 1.3",
+      version: "1.9.0",
+      elixir: "~> 1.4",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       description: description(),
@@ -23,7 +23,7 @@ defmodule SimpleAuth.Mixfile do
   def application do
     [
       mod: {SimpleAuth, []},
-      applications: [:logger],
+      extra_applications: [:logger],
       # Default config
       env: [
         login_url: "/login",
@@ -41,7 +41,9 @@ defmodule SimpleAuth.Mixfile do
       {:phoenix, "~> 1.3.0 or ~> 1.4.0"},
       {:comeonin, "~> 3.0"},
       {:exldap, "~> 0.4", optional: true},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      # Include poison so can run tests (if there were some) as Phoenix needs a JSON library to run
+      {:poison, ">= 0.0.0", only: :test}
     ]
   end
 

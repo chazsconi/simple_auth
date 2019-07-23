@@ -298,7 +298,8 @@ The number of times the user can refresh the session (setting the expiry back to
 Instead of using passwords stored in the DB, an LDAP server can be used to authenticate users.
 This uses the [exldap](https://github.com/jmerriweather/exldap) package.
 
-A User DB table is still used, but rows are automatically inserted for any new users logging in.
+A User DB table is still used, but rows are automatically inserted for any new users logging in (although
+this can be disabled - see below).
 
 To use LDAP do the same as the basic configuration (apart from the user model and migrations - see below)
 and also do the following:
