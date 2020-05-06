@@ -4,8 +4,8 @@ defmodule SimpleAuth.Mixfile do
   def project do
     [
       app: :simple_auth,
-      version: "1.9.0",
-      elixir: "~> 1.4",
+      version: "2.0.0",
+      elixir: "~> 1.7",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       description: description(),
@@ -38,12 +38,11 @@ defmodule SimpleAuth.Mixfile do
 
   defp deps do
     [
-      {:phoenix, "~> 1.3.0 or ~> 1.4.0"},
+      {:phoenix, "~> 1.5.0"},
       {:comeonin, "~> 3.0"},
       {:exldap, "~> 0.4", optional: true},
       {:ex_doc, ">= 0.0.0", only: :dev},
-      # Include poison so can run tests (if there were some) as Phoenix needs a JSON library to run
-      {:poison, ">= 0.0.0", only: :test}
+      {:jason, "~> 1.0"}
     ]
   end
 
