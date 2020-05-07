@@ -2,4 +2,4 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
-config :phoenix, :json_library, Jason
+config :phoenix, :json_library, Poison
