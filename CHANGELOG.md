@@ -1,6 +1,14 @@
 # Changelog
 
 
+## v1.10.0
+
+* Enhancements
+  * Support Phoenix 1.5
+
+* Other
+  * Updated docs for later Phoenix versions
+
 ## v1.9.0
 
 * Enhancements
