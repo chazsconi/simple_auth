@@ -116,7 +116,8 @@ defmodule SimpleAuth.AccessControl do
     any_granted?(user, MapSet.new(check_roles))
   end
 
-  def any_granted?(user, check_roles = %MapSet{}) do
+  # Really this should match check_roles on a MapSet only but this causes a Dialyzer issue: https://github.com/elixir-lang/elixir/issues/8463
+  def any_granted?(user, check_roles) do
     MapSet.size(MapSet.intersection(check_roles, roles(user))) > 0
   end
 end

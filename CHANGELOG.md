@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Bug fixes
+  * Fix dialyzer issue in AccessControl
 
 ## v1.10.0
 
