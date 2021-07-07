@@ -2,8 +2,11 @@
 
 ## Unreleased
 
+## v1.10.1
+
 * Bug fixes
-  * Fix dialyzer issue in AccessControl
+  * Fix dialyzer issue in `AccessControl`
+  * Fix duplicate docs for `AccessControl.roles`
 
 ## v1.10.0
 

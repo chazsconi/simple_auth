@@ -90,10 +90,9 @@ defmodule SimpleAuth.AccessControl do
   @doc "True if user logged in"
   def logged_in?(conn), do: !!current_user(conn)
 
-  @doc "Get the current user's roles as a MapSet"
+  @doc "Get the current user's or a users roles as a MapSet"
   def roles(%Conn{} = conn), do: roles(current_user(conn))
 
-  @doc "Get the user's roles as a MapSet"
   def roles(user) do
     case user do
       nil -> []
