@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## v1.11.0
+
+* Enhancements
+  * Support Phoenix 1.6, remove Phoenix 1.3 support
+
 ## v1.10.1
 
 * Bug fixes
